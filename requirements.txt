@@ -1,0 +1,7 @@
+fastapi[all]==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+psycopg[binary]
+pydantic[email]==2.5.0
+redis==5.0.1
+pytest==7.4.3
