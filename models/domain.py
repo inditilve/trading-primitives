@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from uuid import uuid64
+from uuid import uuid4
 from datetime import datetime
 from enum import Enum
 
 def generate_id() -> str:
-    return str(uuid64())
+    return str(uuid4())
 
 class Side(Enum):
     BUY = "BUY"
