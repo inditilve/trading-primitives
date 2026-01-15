@@ -52,4 +52,7 @@ class Position:
     
     def unrealized_pnl(self, current_price: float) -> float:
         """Unrealized PnL at current price """
+        
+        if self.qty == 0:
+            return 0.0
         return self.qty * (current_price - self.avg_cost)
