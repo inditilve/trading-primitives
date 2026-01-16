@@ -46,7 +46,7 @@ class Position:
     def is_short(self) -> bool:
         return self.qty < 0
     
-    def market_value(self, current_price: float) -> float:
+    def notional_value(self, current_price: float) -> float:
         """Current market value of the position """
         return self.qty * current_price
     
@@ -56,3 +56,11 @@ class Position:
         if self.qty == 0:
             return 0.0
         return self.qty * (current_price - self.avg_cost)
+
+    def is_open(self) -> bool:
+        """Check if position has any qty"""
+        return self.qty != 0
+    
+    def is_closed(self) -> bool:
+        """Check if position is flat"""
+        return self.qty == 0

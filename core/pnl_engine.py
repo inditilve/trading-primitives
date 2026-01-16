@@ -19,6 +19,15 @@ class RealTimePnLEngine:
     def on_trade(self, trade: Trade):
         """Update position and realized PnL"""
         
+        # Validate trade
+        if trade.qty == 0:
+            logger.warning(f"Ignoring trade {trade.trade_id} with qty=0")
+            return
+        
+        if trade.price < 0:
+            logger.warning(f"Ignoring trade {trade.trade_id} with negative price")
+            return
+        
         sym, trade_qty, trade_price = trade.symbol, trade.qty, trade.price
         
         logger.info(f"Trade {trade.trade_id}: {sym} qty={trade_qty} price={trade_price:.2f} notional={trade.notional_value():.2f}")
@@ -106,3 +115,57 @@ class RealTimePnLEngine:
         return sum(
             self.realized_pnl[sym] + self.get_unrealized_pnl(sym) 
             for sym in self.positions)
+
+    def get_long_positions(self) -> dict[str, Position]:
+        """Get all long positions"""
+        return {sym: pos for sym, pos in self.positions.items() if pos.is_long()}
+    
+    def get_short_positions(self) -> dict[str, Position]:
+        """Get all short positions"""
+        return {sym: pos for sym, pos in self.positions.items() if pos.is_short()}
+    
+    def get_open_positions(self) -> dict[str, Position]:
+        """Get all open positions (non-zero qty)"""
+        return {sym: pos for sym, pos in self.positions.items() if pos.is_open()}
+    
+    def get_pnl_by_symbol(self, symbol: str) -> dict[str, float]:
+        """Get both realized and unrealized PnL for a symbol"""
+        return {
+            "realized": self.realized_pnl.get(symbol, 0.0),
+            "unrealized": self.get_unrealized_pnl(symbol),
+            "total": self.realized_pnl.get(symbol, 0.0) + self.get_unrealized_pnl(symbol)
+        }
+    
+    def get_total_notional(self, last_prices: dict[str, float]) -> float:
+        """Total notional value across all positions"""
+        return sum(
+            pos.notional_value(last_prices.get(pos.symbol, 0.0))
+            for pos in self.positions.values()
+        )
+
+    def log_summary(self, symbol: str | None = None) -> str:
+        """Log engine summary for debugging"""
+        if symbol:
+            pos = self.get_position(symbol)
+            realized = self.realized_pnl.get(symbol, 0.0)
+            unrealized = self.get_unrealized_pnl(symbol)
+            summary = (
+                f"{symbol}: qty={pos.qty}, avg_cost={pos.avg_cost:.2f}, "
+                f"realized={realized:.2f}, unrealized={unrealized:.2f}, "
+                f"total={realized + unrealized:.2f}"
+            )
+        else:
+            # All symbols
+            positions_count = len(self.positions)
+            total_realized = sum(self.realized_pnl.values())
+            total_unrealized = sum(
+                self.get_unrealized_pnl(sym) for sym in self.positions
+            )
+            summary = (
+                f"Account {self.account_id}: {positions_count} symbols, "
+                f"realized={total_realized:.2f}, unrealized={total_unrealized:.2f}, "
+                f"total={self.get_total_pnl():.2f}"
+            )
+        
+        logger.info(summary)
+        return summary

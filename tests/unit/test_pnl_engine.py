@@ -228,13 +228,12 @@ class TestRealTimePnLEngine:
         assert total == 1500.0
     
     def test_get_total_pnl_zero_when_no_positions(self, engine: RealTimePnLEngine):
-        """Test 23: total PnL is zero with no positions"""
+        """Total PnL is zero with no positions"""
         assert engine.get_total_pnl() == 0.0
     
     """Multi-Symbol Tests"""
-    
     def test_multiple_symbols_independent_positions(self, engine: RealTimePnLEngine, sample_trade: Trade):
-        """Test 24: positions for different symbols are independent"""
+        """Positions for different symbols are independent"""
         engine.on_trade(sample_trade)
         engine.on_trade(Trade(symbol="MSFT", qty=50, price=300.0))
         engine.on_trade(Trade(symbol="GOOGL", qty=-25, price=2000.0))
@@ -251,8 +250,8 @@ class TestRealTimePnLEngine:
         assert googl_pos.avg_cost == 2000.0
     
     def test_multiple_symbols_independent_pnl(self, engine: RealTimePnLEngine, sample_trade: Trade):
-        """Test 25: PnL calculations independent per symbol"""
-        engine.on_trade(Trade(symbol="AAPL", qty=sample_trade.qty, price=sample_trade.price))
+        """PnL calculations independent per symbol"""
+        engine.on_trade(sample_trade)
         engine.on_trade(Trade(symbol="MSFT", qty=100, price=300.0))
         
         engine.on_trade(Trade(symbol="AAPL", qty=-sample_trade.qty, price=160.0))
@@ -261,3 +260,45 @@ class TestRealTimePnLEngine:
         assert engine.realized_pnl["AAPL"] == 1000.0
         assert engine.realized_pnl.get("MSFT", 0.0) == 0.0
         assert engine.get_unrealized_pnl("MSFT") == 1000.0
+    
+    """Filter and Summary Tests"""
+    def test_get_long_positions(self, engine: RealTimePnLEngine, sample_trade: Trade):
+        """Filter long positions only"""
+        engine.on_trade(sample_trade)  # AAPL long
+        engine.on_trade(Trade(symbol="MSFT", qty=-50, price=300.0))  # MSFT short
+        
+        long_pos = engine.get_long_positions()
+        assert "AAPL" in long_pos
+        assert "MSFT" not in long_pos
+
+    def test_get_short_positions(self, engine: RealTimePnLEngine, sample_trade: Trade):
+        """Filter short positions only"""
+        engine.on_trade(sample_trade)  # AAPL long
+        engine.on_trade(Trade(symbol="MSFT", qty=-50, price=300.0))  # MSFT short
+        
+        short_pos = engine.get_short_positions()
+        assert "MSFT" in short_pos
+        assert "AAPL" not in short_pos
+
+    def test_get_pnl_by_symbol(self, engine: RealTimePnLEngine, sample_trade: Trade):
+        """Get realized + unrealized breakdown for one symbol"""
+        engine.on_trade(sample_trade)  # Buy 100@150
+        engine.on_trade(Trade(symbol="AAPL", qty=-50, price=160.0))  # Sell 50@160
+        engine.on_price("AAPL", 155.0)  # Mark at 155
+        
+        pnl = engine.get_pnl_by_symbol("AAPL")
+        assert pnl["realized"] == 500.0  # 50 * (160 - 150)
+        assert pnl["unrealized"] == 250.0  # 50 * (155 - 150)
+        assert pnl["total"] == 750.0
+
+    def test_get_total_notional(self, engine: RealTimePnLEngine):
+        """Calculate total notional value across all positions"""
+        engine.on_trade(Trade(symbol="AAPL", qty=100, price=150.0))
+        engine.on_trade(Trade(symbol="MSFT", qty=50, price=300.0))
+        
+        last_prices = {"AAPL": 160.0, "MSFT": 310.0}
+        total = engine.get_total_notional(last_prices)
+        # AAPL: 100 * 160 = 16000
+        # MSFT: 50 * 310 = 15500
+        # Total: 31500
+        assert total == 31500.0
