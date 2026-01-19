@@ -73,3 +73,6 @@ markers = [
     "integration: integration tests",
     "slow: slow tests",
 ]
+
+[tool.setuptools]
+packages = ["core", "models", "api", "persistence"]
