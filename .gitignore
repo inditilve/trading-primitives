@@ -1,3 +1,4 @@
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -15,11 +16,42 @@ parts/
 sdist/
 var/
 wheels/
-.env
-.venv
-venv/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+junit/
+.tox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# Pre-commit
+.pre-commit/
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.venv
+env/
+venv/
+conda-env/
+
+# Conda
 .conda/
-*.db
-.DS_Store
+
+# Dev Notes
+notes/
