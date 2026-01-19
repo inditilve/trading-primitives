@@ -1,7 +1,5 @@
 """Models package: domain models and API schemas."""
-from models.domain import Trade, Position
 
-__all__ = [
-    "Trade",
-    "Position"
-]
+from models.domain import Position, Trade
+
+__all__ = ["Trade", "Position"]
