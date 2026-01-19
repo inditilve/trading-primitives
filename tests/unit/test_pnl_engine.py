@@ -61,7 +61,7 @@ class TestRealTimePnLEngine:
 
         pos: Position = engine.get_position("AAPL")
         assert pos.qty == 150
-        assert pos.avg_cost == (sample_trade.notional_value() + 50 * 160.0) / sample_trade.price
+        assert pos.avg_cost == (sample_trade.notional_value() + 50 * 160.0) / (sample_trade.qty + 50)
 
     def test_same_direction_multiple_buys(self, engine: RealTimePnLEngine, sample_trade: Trade):
         """Multiple buys at different prices update weighted avg correctly"""

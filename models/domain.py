@@ -24,7 +24,7 @@ class Trade:
     price: float
     trade_id: str = field(default_factory=generate_id)
     order_id: str | None = None  # Link to parent order
-    timestamp: datetime = field(default_factory=datetime.now().astimezone)
+    timestamp: datetime = field(default_factory=lambda: datetime.now().astimezone())
 
     def notional_value(self) -> float:
         return abs(self.qty) * self.price
@@ -41,7 +41,7 @@ class Position:
     qty: int = 0
     avg_cost: float = 0.0
     position_id: str = field(default_factory=generate_id)
-    updated_at: datetime = field(default_factory=datetime.now().astimezone)
+    updated_at: datetime = field(default_factory=lambda: datetime.now().astimezone())
 
     def is_long(self) -> bool:
         return self.qty > 0
