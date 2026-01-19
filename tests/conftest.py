@@ -1,13 +1,14 @@
 import pytest
 
-from models import Position, Trade
+from models import Side, Trade
 
 
 @pytest.fixture
 def sample_trade() -> Trade:
-    return Trade(symbol="AAPL", qty=100, price=150.0)
-
-
-@pytest.fixture
-def sample_position() -> Position:
-    return Position(account_id="PM1", symbol="AAPL", qty=100, avg_cost=150.0)
+    """Standard buy trade for testing"""
+    return Trade(
+        symbol="AAPL",
+        side=Side.BUY,
+        qty=100,
+        price=150.0,
+    )

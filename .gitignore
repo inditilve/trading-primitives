@@ -53,5 +53,5 @@ conda-env/
 # Conda
 .conda/
 
-#Dev Notes
+# Dev Notes
 notes/
