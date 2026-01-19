@@ -8,9 +8,9 @@ sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
 testcontainers==3.7.0
 redis==5.0.1
-fastapi[all]==0.104.1
+fastapi[all]==0.109.1
 uvicorn[standard]==0.24.0
 pydantic[email]==2.5.0
-ruff==0.1.11
+ruff==0.14.13
 mypy==1.7.1
 pre-commit==3.5.0

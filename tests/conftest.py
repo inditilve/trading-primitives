@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 
 from models import Position, Trade
@@ -13,8 +11,3 @@ def sample_trade() -> Trade:
 @pytest.fixture
 def sample_position() -> Position:
     return Position(account_id="PM1", symbol="AAPL", qty=100, avg_cost=150.0)
-
-
-@pytest.fixture
-def mock_logger() -> MagicMock:
-    return MagicMock()

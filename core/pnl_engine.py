@@ -115,9 +115,7 @@ class RealTimePnLEngine:
 
         if pos.qty == 0:
             return 0.0
-        last_px = self.last_prices.get(symbol)
-        if last_px is None:
-            return 0.0
+        last_px = self.last_prices[symbol]
         return pos.unrealized_pnl(last_px)
 
     def get_total_pnl(self) -> float:
